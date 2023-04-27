@@ -721,6 +721,12 @@ void blk_mq_start_request(struct request *rq)
 	struct request_queue *q = rq->q;
 
 	trace_block_rq_issue(rq);
+	//yuhun
+	if (rq->bOverwrite)
+		printk(KERN_ERR "ow in rq\n");
+	if (rq->bAppend)
+		printk(KERN_ERR "ap in rq, psector=%llu\n", rq->__prior_sector);
+	//yuhun
 
 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
 		rq->io_start_time_ns = ktime_get_ns();
@@ -1958,6 +1964,13 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
 		rq->cmd_flags |= REQ_FAILFAST_MASK;
 
 	rq->__sector = bio->bi_iter.bi_sector;
+	
+	//yuhun
+	rq->__prior_sector = bio->prior_bi_sector;
+	rq->bOverwrite = bio->bOverwrite;
+	rq->bAppend = bio->bAppend;
+	//
+
 	rq->write_hint = bio->bi_write_hint;
 	blk_rq_bio_prep(rq, bio, nr_segs);
 

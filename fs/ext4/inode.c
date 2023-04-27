@@ -510,6 +510,16 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 	memcpy(&orig_map, map, sizeof(*map));
 #endif
 
+	//yuhun
+	int yhdebug = 0;
+	if (map->m_flags==10)
+	{
+		yhdebug =1;
+		if(yhdebug)
+			printk(KERN_ERR "mountstate = %x\n",(EXT4_SB(inode->i_sb)->s_mount_state));		
+	}
+	//yuhun
+
 	map->m_flags = 0;
 	ext_debug(inode, "flag 0x%x, max_blocks %u, logical block %lu\n",
 		  flags, map->m_len, (unsigned long) map->m_lblk);
@@ -535,7 +545,11 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 			retval = es.es_len - (map->m_lblk - es.es_lblk);
 			if (retval > map->m_len)
 				retval = map->m_len;
-			map->m_len = retval;
+			map->m_len = retval;			
+			//yuhun
+			if (yhdebug)
+				printk(KERN_ERR "written or unwritten, flag: %x\n",map->m_flags);	
+			//yuhun
 		} else if (ext4_es_is_delayed(&es) || ext4_es_is_hole(&es)) {
 			map->m_pblk = 0;
 			retval = es.es_len - (map->m_lblk - es.es_lblk);
@@ -543,6 +557,10 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 				retval = map->m_len;
 			map->m_len = retval;
 			retval = 0;
+			//yuhun
+			if (yhdebug)
+				printk(KERN_ERR "delayed or hole, flag: %x\n",map->m_flags);	
+			//yuhun
 		} else {
 			BUG();
 		}
@@ -550,8 +568,17 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 		ext4_map_blocks_es_recheck(handle, inode, map,
 					   &orig_map, flags);
 #endif
+		//yuhun
+		if (yhdebug)
+			printk(KERN_ERR "lookup extent found, flag: %x\n",map->m_flags);	
+		//yuhun
 		goto found;
 	}
+
+	//yuhun
+	if (yhdebug)
+		printk(KERN_ERR "lookup extent not found\n");	
+	//yuhun
 
 	/*
 	 * Try to see if we can get the block without requesting a new
@@ -560,8 +587,17 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 	down_read(&EXT4_I(inode)->i_data_sem);
 	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) {
 		retval = ext4_ext_map_blocks(handle, inode, map, 0);
+		//yuhun
+		if (yhdebug)
+			printk(KERN_ERR "ext_map_blocks\n");	
+		//yuhun
+
 	} else {
 		retval = ext4_ind_map_blocks(handle, inode, map, 0);
+		//yuhun
+		if (yhdebug)
+			printk(KERN_ERR "ind_map_blocks\n");	
+		//yuhun
 	}
 	if (retval > 0) {
 		unsigned int status;

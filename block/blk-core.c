@@ -114,6 +114,11 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
 	INIT_LIST_HEAD(&rq->queuelist);
 	rq->q = q;
 	rq->__sector = (sector_t) -1;
+	//yuhun
+	rq->bOverwrite = false;
+	rq->bAppend = false;
+	rq->__prior_sector = (sector_t) -1;
+	//yuhun
 	INIT_HLIST_NODE(&rq->hash);
 	RB_CLEAR_NODE(&rq->rb_node);
 	rq->tag = BLK_MQ_NO_TAG;
@@ -751,6 +756,11 @@ static int blk_partition_remap(struct bio *bio)
 		return -EIO;
 	if (bio_sectors(bio)) {
 		bio->bi_iter.bi_sector += p->bd_start_sect;
+		
+		//yuhun
+		bio->prior_bi_sector += p->bd_start_sect;
+		//yuhun
+		
 		trace_block_bio_remap(bio, p->bd_dev,
 				      bio->bi_iter.bi_sector -
 				      p->bd_start_sect);

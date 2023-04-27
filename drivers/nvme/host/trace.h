@@ -58,6 +58,10 @@ TRACE_EVENT(nvme_setup_cmd,
 		__field(u32, nsid)
 		__field(bool, metadata)
 		__array(u8, cdw10, 24)
+		__field(u8, bAP)
+		__field(u8, bOW)
+		__array(u8, cdw2, 24)
+
 	    ),
 	    TP_fast_assign(
 		__entry->ctrl_id = nvme_req(req)->ctrl->instance;
@@ -71,15 +75,22 @@ TRACE_EVENT(nvme_setup_cmd,
 		__assign_disk_name(__entry->disk, req->rq_disk);
 		memcpy(__entry->cdw10, &cmd->common.cdw10,
 			sizeof(__entry->cdw10));
+		__entry->bAP = (cmd->rw.control>>8) & 0x1;
+		__entry->bOW = (cmd->rw.control>>9) & 0x1;
+		memcpy(__entry->cdw2, &cmd->common.cdw2,
+			sizeof(__entry->cdw2));
 	    ),
-	    TP_printk("nvme%d: %sqid=%d, cmdid=%u, nsid=%u, flags=0x%x, meta=0x%x, cmd=(%s %s)",
+	    TP_printk("nvme%d: %sqid=%d, cmdid=%u, nsid=%u, flags=0x%x, meta=0x%x, cmd=(%s %s), AP=%u, OW=%u, psct=%llu",
 		      __entry->ctrl_id, __print_disk_name(__entry->disk),
 		      __entry->qid, __entry->cid, __entry->nsid,
 		      __entry->flags, __entry->metadata,
 		      show_opcode_name(__entry->qid, __entry->opcode,
 				__entry->fctype),
 		      parse_nvme_cmd(__entry->qid, __entry->opcode,
-				__entry->fctype, __entry->cdw10))
+				__entry->fctype, __entry->cdw10),
+				__entry->bAP,
+				__entry->bOW,
+				get_unaligned_le64(__entry->cdw2))
 );
 
 TRACE_EVENT(nvme_complete_rq,

@@ -394,6 +394,15 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 {
 	struct bio *bio;
 
+	//yuhun
+	struct page *page = bh->b_page;
+	struct address_space *mapping = page->mapping;
+	struct inode *inode = mapping->host;
+	const unsigned blkbits = inode->i_blkbits;
+	struct ext4_map_blocks map;
+
+	//yuhun
+
 	/*
 	 * bio_alloc will _always_ be able to allocate a bio if
 	 * __GFP_DIRECT_RECLAIM is set, see comments for bio_alloc_bioset().
@@ -407,6 +416,63 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 	io->io_bio = bio;
 	io->io_next_block = bh->b_blocknr;
 	wbc_init_bio(io->io_wbc, bio);
+
+	//yuhun
+	if (inode->i_ino < 100 || inode->i_ino >1000000)
+	{
+		bio->bOverwrite = false;
+		bio->bAppend = false;
+		
+		map.m_lblk = (sector_t)(page->index) << (PAGE_SHIFT - blkbits);
+		map.m_len = 1;
+		map.m_flags = 10; //yhdebug
+		if (ext4_map_blocks(NULL, inode, &map, 0) < 0)
+		{
+			printk(KERN_ERR "Can not find prior block, flag=%x\n",map.m_flags);
+			goto fail;
+		}
+
+		if (map.m_flags & EXT4_MAP_UNWRITTEN)
+		{	//Create Append
+			if ((sector_t)(page->index) != 0)
+			{	//APPEND
+				map.m_lblk = (sector_t)(page->index-1) << (PAGE_SHIFT - blkbits);
+				map.m_len = 1;
+				map.m_flags = 0;
+				if(ext4_map_blocks(NULL, inode, &map, 0) < 0) 
+				{
+					printk(KERN_ERR "Can not find prior block, flag=%x\n",map.m_flags);
+					goto fail;
+				}
+
+				if (map.m_flags & EXT4_MAP_UNWRITTEN)
+				{//hole file
+					printk(KERN_ERR "[HOLE] this is Append but prior is unwritten, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+				}
+
+				else
+				{
+					bio->bAppend = true;
+					bio->prior_bi_sector = map.m_pblk << (blkbits - 9);
+					printk(KERN_ERR "this is Append and prior, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index-1), map.m_flags);
+				}
+			}
+			else
+			{	//Create
+				printk(KERN_ERR "this is Create, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+			}
+		}
+		else
+		{	//Overwrite
+			bio->bOverwrite = true;
+			printk(KERN_ERR "this is Overwrite, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+		}
+
+		return;
+	fail:
+		printk(KERN_ERR "[ERROR] map_block error, flag=%x\n",map.m_flags);
+	}
+	//yuhun
 }
 
 static void io_submit_add_bh(struct ext4_io_submit *io,

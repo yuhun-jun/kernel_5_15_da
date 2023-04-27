@@ -226,6 +226,11 @@ struct bio {
 	atomic_t		__bi_remaining;
 
 	struct bvec_iter	bi_iter;
+	//yuhun
+	sector_t			prior_bi_sector;	/* device address in 512 byte sectors */
+	unsigned short bOverwrite;
+	unsigned short bAppend;
+	//yuhun
 
 	bio_end_io_t		*bi_end_io;
 

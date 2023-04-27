@@ -819,12 +819,13 @@ struct nvme_rw_command {
 	__u8			flags;
 	__u16			command_id;
 	__le32			nsid;
-	__u64			rsvd2;
+//	__u64			rsvd2;            //Origin
+	__le64			rsvd2;            //yuhun reserved 8byte to prior block
 	__le64			metadata;
 	union nvme_data_ptr	dptr;
-	__le64			slba;
+	__le64			slba;           //DWORD10, 11
 	__le16			length;
-	__le16			control;
+	__le16			control;        // bit 0,1,2,3, bit8, bit9 reserved to owap mark
 	__le32			dsmgmt;
 	__le32			reftag;
 	__le16			apptag;
@@ -834,6 +835,10 @@ struct nvme_rw_command {
 enum {
 	NVME_RW_LR			= 1 << 15,
 	NVME_RW_FUA			= 1 << 14,
+//yuhun
+	NVME_RW_APPEND				= 1 << 8,
+	NVME_RW_OVERWRITE			= 1 << 9,
+//yuhun
 	NVME_RW_APPEND_PIREMAP		= 1 << 9,
 	NVME_RW_DSM_FREQ_UNSPEC		= 0,
 	NVME_RW_DSM_FREQ_TYPICAL	= 1,
