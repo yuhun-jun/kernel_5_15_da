@@ -418,7 +418,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 	wbc_init_bio(io->io_wbc, bio);
 
 	//yuhun
-	if (inode->i_ino < 100 || inode->i_ino >1000000)
+	//if (inode->i_ino < 100 || inode->i_ino >1000000)
 	{
 		bio->bOverwrite = false;
 		bio->bAppend = false;
