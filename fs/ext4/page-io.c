@@ -425,7 +425,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 		
 		map.m_lblk = (sector_t)(page->index) << (PAGE_SHIFT - blkbits);
 		map.m_len = 1;
-		map.m_flags = 10; //yhdebug
+		map.m_flags = 0; //10; //yhdebug
 		if (ext4_map_blocks(NULL, inode, &map, 0) < 0)
 		{
 			printk(KERN_ERR "Can not find prior block, flag=%x\n",map.m_flags);
@@ -447,25 +447,25 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 
 				if (map.m_flags & EXT4_MAP_UNWRITTEN)
 				{//hole file
-					printk(KERN_ERR "[HOLE] this is Append but prior is unwritten, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+					//printk(KERN_ERR "[HOLE] this is Append but prior is unwritten, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
 				}
 
 				else
 				{
 					bio->bAppend = true;
 					bio->prior_bi_sector = map.m_pblk << (blkbits - 9);
-					printk(KERN_ERR "this is Append and prior, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index-1), map.m_flags);
+					//printk(KERN_ERR "this is Append and prior, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index-1), map.m_flags);
 				}
 			}
 			else
 			{	//Create
-				printk(KERN_ERR "this is Create, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+				//printk(KERN_ERR "this is Create, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
 			}
 		}
 		else
 		{	//Overwrite
 			bio->bOverwrite = true;
-			printk(KERN_ERR "this is Overwrite, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
+			//printk(KERN_ERR "this is Overwrite, inode=%lu, page->index = %llu, m_flags=%x\n",inode->i_ino, (sector_t)(page->index), map.m_flags);
 		}
 
 		return;

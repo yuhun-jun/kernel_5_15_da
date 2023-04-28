@@ -723,9 +723,9 @@ void blk_mq_start_request(struct request *rq)
 	trace_block_rq_issue(rq);
 	//yuhun
 	if (rq->bOverwrite)
-		printk(KERN_ERR "ow in rq\n");
+		//printk(KERN_ERR "ow in rq\n");
 	if (rq->bAppend)
-		printk(KERN_ERR "ap in rq, psector=%llu\n", rq->__prior_sector);
+		//printk(KERN_ERR "ap in rq, psector=%llu\n", rq->__prior_sector);
 	//yuhun
 
 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {

@@ -929,19 +929,19 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
 //yuhun
 	if (op == nvme_cmd_write)
 	{
-		printk(KERN_ERR "[NVME_SETUP_RW] Write, sector = %llu \n", req->__sector);
+		//printk(KERN_ERR "[NVME_SETUP_RW] Write, sector = %llu \n", req->__sector);
 	}
 	if (req->bOverwrite)
 	{
 		control |= NVME_RW_OVERWRITE;
-		printk(KERN_ERR "[NVME_SETUP_RW] Overwrite \n");
+		//printk(KERN_ERR "[NVME_SETUP_RW] Overwrite \n");
 	}
 
 	if (req->bAppend)
 	{	
 		control |= NVME_RW_APPEND;
 		cmnd->rw.rsvd2 = cpu_to_le64(nvme_sect_to_lba(ns, req->__prior_sector));
-		printk(KERN_ERR "[NVME_SETUP_RW] Append, psector = %llu \n", req->__prior_sector);
+		//printk(KERN_ERR "[NVME_SETUP_RW] Append, psector = %llu \n", req->__prior_sector);
 	}
 //yuhun
 
