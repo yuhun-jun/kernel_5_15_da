@@ -825,10 +825,20 @@ static int _ext4_get_block(struct inode *inode, sector_t iblock,
 
 	map.m_lblk = iblock;
 	map.m_len = bh->b_size >> inode->i_blkbits;
-
+//yuhun
+	map.m_flags=10; //debug
+//yuhun
 	ret = ext4_map_blocks(ext4_journal_current_handle(), inode, &map,
 			      flags);
 	if (ret > 0) {
+
+		//yuhun
+		if (inode->i_ino < 100 || inode->i_ino >1000000)
+		{
+			//printk(KERN_ERR "[BEGIN] getblock map flag=%x\n",map.m_flags);	
+		}
+		//yuhun
+
 		map_bh(bh, inode->i_sb, map.m_pblk);
 		ext4_update_bh_state(bh, map.m_flags);
 		bh->b_size = inode->i_sb->s_blocksize * map.m_len;
@@ -1321,6 +1331,11 @@ static int ext4_write_end(struct file *file,
 	int ret = 0, ret2;
 	int i_size_changed = 0;
 	bool verity = ext4_verity_in_progress(inode);
+	//yuhun
+	loff_t new_size=0;
+	long long oldblockcount=0;
+	long long newblockcount=0;
+	//yuhun
 
 	trace_ext4_write_end(inode, pos, len, copied);
 
@@ -1350,6 +1365,25 @@ static int ext4_write_end(struct file *file,
 	 */
 	if (i_size_changed)
 		ret = ext4_mark_inode_dirty(handle, inode);
+
+	//yuhun
+	//if (inode->i_ino < 100 || inode->i_ino >1000000)
+	{
+		//printk(KERN_ERR "[END], pos=%llu, copied=%u \n",pos, copied);	
+
+		new_size = inode->i_size;
+		oldblockcount = (old_size + 4096 - 1)/4096; //roundup
+		newblockcount = (new_size + 4096 - 1)/4096; //roundup
+		if (newblockcount > oldblockcount)
+		{//append, block size changed
+			SetPageFileBlkChanged(page);
+		}			
+		// else [To avoid new write_begin before write_page]
+		// {//overwrite, not changed			
+		// 	ClearPageFileBlkChanged(page);
+		// }
+	}
+	//yuhun
 
 	if (pos + len > inode->i_size && !verity && ext4_can_truncate(inode))
 		/* if we have allocated more blocks and copied
