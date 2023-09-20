@@ -46,6 +46,6 @@ All changes are annotated with "//2448" before and after.
 - Added debugging information to the NVMe command log.
 
 #### include/linux/nvme.h
-- Introduced information into the NVMe command structure.
+- Added information to the NVMe command structure.
 
 
