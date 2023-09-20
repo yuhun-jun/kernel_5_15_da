@@ -1,18 +1,50 @@
-Linux kernel
-============
+# Project Overview
 
-There are several guides for kernel developers and users. These guides can
-be rendered in a number of formats, like HTML and PDF. Please read
-Documentation/admin-guide/README.rst first.
+This project focuses on researching performance degradation caused by file fragmentation. The codebase is branched from Linux Kernel 5.15.0, and it aims to enhance performance by modifying the filesystem, block layer, and NVMe device driver. These modifications enable the transmission of filesystem-level append and overwrite information to NVMe commands.
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.  The formatted documentation can also be read online at:
+## Modified Files
 
-    https://www.kernel.org/doc/html/latest/
+### Filesystem and Block Layer
 
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
+#### block/bio.c
+- Verified if the filesize has changed.
 
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
+#### fs/ext4/inode.c
+- Checked for changes in filesize.
+
+#### include/linux/page-flags.h
+- Monitored filesize changes.
+
+#### fs/ext4/page-io.c
+- Examined extent status and stored additional information in the bio.
+
+#### include/trace/events/mmflags.h
+- Added 'filesizechanged' to map flags.
+
+#### block/blk-core.c
+- Initialized requests.
+
+#### block/blk-mq.c
+- Recorded additional information in requests.
+
+#### fs/ext4/inode.c
+- Monitored block count changes.
+
+#### include/linux/blk_types.h
+- Added information to the bio structure.
+
+#### include/linux/blkdev.h
+- Added information to the request structure.
+
+### Device Driver
+
+#### drivers/nvme/host/core.c
+- Incorporated information into NVMe commands based on request details.
+
+#### drivers/nvme/host/trace.h
+- Added debugging information to the NVMe command log.
+
+#### include/linux/nvme.h
+- Introduced information into the NVMe command structure.
+
+
