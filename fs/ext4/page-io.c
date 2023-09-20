@@ -426,7 +426,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 		
 		map.m_lblk = (sector_t)(page->index) << (PAGE_SHIFT - blkbits);
 		map.m_len = 1;
-		map.m_flags = 10; //yhdebug
+		map.m_flags = 0; //yhdebug
 
 		if (test_opt(inode->i_sb, DELALLOC))
 		{ //delayed allocation case
