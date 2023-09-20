@@ -820,7 +820,7 @@ struct nvme_rw_command {
 	__u16			command_id;
 	__le32			nsid;
 //	__u64			rsvd2;            //Origin
-	__le64			rsvd2;            //yuhun reserved 8byte to prior block
+	__le64			rsvd2;            //2448 reserved 8byte to prior block
 	__le64			metadata;
 	union nvme_data_ptr	dptr;
 	__le64			slba;           //DWORD10, 11
@@ -835,10 +835,10 @@ struct nvme_rw_command {
 enum {
 	NVME_RW_LR			= 1 << 15,
 	NVME_RW_FUA			= 1 << 14,
-//yuhun
+//2448
 	NVME_RW_APPEND				= 1 << 8,
 	NVME_RW_OVERWRITE			= 1 << 9,
-//yuhun
+//2448
 	NVME_RW_APPEND_PIREMAP		= 1 << 9,
 	NVME_RW_DSM_FREQ_UNSPEC		= 0,
 	NVME_RW_DSM_FREQ_TYPICAL	= 1,

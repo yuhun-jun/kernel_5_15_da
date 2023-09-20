@@ -39,7 +39,7 @@ struct blk_queue_stats;
 struct blk_stat_callback;
 struct blk_keyslot_manager;
 
-#define BLKDEV_MIN_RQ	1 /*yuhun, for nr_request 1 test. origin is 4.*/
+#define BLKDEV_MIN_RQ	1 /*2448, for nr_request 1 test. origin is 4.*/
 #define BLKDEV_MAX_RQ	128	/* Default maximum */
 
 /* Must be consistent with blk_mq_poll_stats_bkt() */
@@ -130,11 +130,11 @@ struct request {
 	unsigned int __data_len;	/* total data len */
 	sector_t __sector;		/* sector cursor */
 
-	//yuhun
+	//2448
 	unsigned short bOverwrite;
 	unsigned short bAppend;
 	sector_t __prior_sector;		/* sector cursor */
-	//yuhun
+	//2448
 
 	struct bio *bio;
 	struct bio *biotail;

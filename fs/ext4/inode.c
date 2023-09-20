@@ -510,15 +510,15 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 	memcpy(&orig_map, map, sizeof(*map));
 #endif
 
-	//yuhun
-	int yhdebug = 0;
+	//2448
+	int debug2448 = 0;
 	if (map->m_flags==10)
 	{
-		yhdebug =1;
-		if(yhdebug)
+		debug2448 =1;
+		if(debug2448)
 			printk(KERN_ERR "mountstate = %x\n",(EXT4_SB(inode->i_sb)->s_mount_state));		
 	}
-	//yuhun
+	//2448
 
 	map->m_flags = 0;
 	ext_debug(inode, "flag 0x%x, max_blocks %u, logical block %lu\n",
@@ -546,10 +546,10 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 			if (retval > map->m_len)
 				retval = map->m_len;
 			map->m_len = retval;			
-			//yuhun
-			if (yhdebug)
+			//2448
+			if (debug2448)
 				printk(KERN_ERR "written or unwritten, flag: %x\n",map->m_flags);	
-			//yuhun
+			//2448
 		} else if (ext4_es_is_delayed(&es) || ext4_es_is_hole(&es)) {
 			map->m_pblk = 0;
 			retval = es.es_len - (map->m_lblk - es.es_lblk);
@@ -557,10 +557,10 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 				retval = map->m_len;
 			map->m_len = retval;
 			retval = 0;
-			//yuhun
-			if (yhdebug)
+			//2448
+			if (debug2448)
 				printk(KERN_ERR "delayed or hole, flag: %x\n",map->m_flags);	
-			//yuhun
+			//2448
 		} else {
 			BUG();
 		}
@@ -568,17 +568,17 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 		ext4_map_blocks_es_recheck(handle, inode, map,
 					   &orig_map, flags);
 #endif
-		//yuhun
-		if (yhdebug)
+		//2448
+		if (debug2448)
 			printk(KERN_ERR "lookup extent found, flag: %x\n",map->m_flags);	
-		//yuhun
+		//2448
 		goto found;
 	}
 
-	//yuhun
-	if (yhdebug)
+	//2448
+	if (debug2448)
 		printk(KERN_ERR "lookup extent not found\n");	
-	//yuhun
+	//2448
 
 	/*
 	 * Try to see if we can get the block without requesting a new
@@ -587,17 +587,17 @@ int ext4_map_blocks(handle_t *handle, struct inode *inode,
 	down_read(&EXT4_I(inode)->i_data_sem);
 	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) {
 		retval = ext4_ext_map_blocks(handle, inode, map, 0);
-		//yuhun
-		if (yhdebug)
+		//2448
+		if (debug2448)
 			printk(KERN_ERR "ext_map_blocks\n");	
-		//yuhun
+		//2448
 
 	} else {
 		retval = ext4_ind_map_blocks(handle, inode, map, 0);
-		//yuhun
-		if (yhdebug)
+		//2448
+		if (debug2448)
 			printk(KERN_ERR "ind_map_blocks\n");	
-		//yuhun
+		//2448
 	}
 	if (retval > 0) {
 		unsigned int status;
@@ -825,19 +825,19 @@ static int _ext4_get_block(struct inode *inode, sector_t iblock,
 
 	map.m_lblk = iblock;
 	map.m_len = bh->b_size >> inode->i_blkbits;
-//yuhun
+//2448
 	map.m_flags=10; //debug
-//yuhun
+//2448
 	ret = ext4_map_blocks(ext4_journal_current_handle(), inode, &map,
 			      flags);
 	if (ret > 0) {
 
-		//yuhun
+		//2448
 		if (inode->i_ino < 100 || inode->i_ino >1000000)
 		{
 			//printk(KERN_ERR "[BEGIN] getblock map flag=%x\n",map.m_flags);	
 		}
-		//yuhun
+		//2448
 
 		map_bh(bh, inode->i_sb, map.m_pblk);
 		ext4_update_bh_state(bh, map.m_flags);
@@ -1331,11 +1331,11 @@ static int ext4_write_end(struct file *file,
 	int ret = 0, ret2;
 	int i_size_changed = 0;
 	bool verity = ext4_verity_in_progress(inode);
-	//yuhun
+	//2448
 	loff_t new_size=0;
 	long long oldblockcount=0;
 	long long newblockcount=0;
-	//yuhun
+	//2448
 
 	trace_ext4_write_end(inode, pos, len, copied);
 
@@ -1366,7 +1366,7 @@ static int ext4_write_end(struct file *file,
 	if (i_size_changed)
 		ret = ext4_mark_inode_dirty(handle, inode);
 
-	//yuhun
+	//2448
 	//if (inode->i_ino < 100 || inode->i_ino >1000000)
 	{
 		//printk(KERN_ERR "[END], pos=%llu, copied=%u \n",pos, copied);	
@@ -1383,7 +1383,7 @@ static int ext4_write_end(struct file *file,
 		// 	ClearPageFileBlkChanged(page);
 		// }
 	}
-	//yuhun
+	//2448
 
 	if (pos + len > inode->i_size && !verity && ext4_can_truncate(inode))
 		/* if we have allocated more blocks and copied

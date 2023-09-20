@@ -394,14 +394,14 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 {
 	struct bio *bio;
 
-	//yuhun
+	//2448
 	struct page *page = bh->b_page;
 	struct address_space *mapping = page->mapping;
 	struct inode *inode = mapping->host;
 	const unsigned blkbits = inode->i_blkbits;
 	struct ext4_map_blocks map;
 
-	//yuhun
+	//2448
 
 	/*
 	 * bio_alloc will _always_ be able to allocate a bio if
@@ -418,7 +418,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 	wbc_init_bio(io->io_wbc, bio);
 
 
-	//yuhun
+	//2448
 	//if (inode->i_ino < 100 || inode->i_ino >1000000)
 	{
 		bio->bOverwrite = false;
@@ -426,7 +426,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 		
 		map.m_lblk = (sector_t)(page->index) << (PAGE_SHIFT - blkbits);
 		map.m_len = 1;
-		map.m_flags = 0; //yhdebug
+		map.m_flags = 0; //debug2448
 
 		if (test_opt(inode->i_sb, DELALLOC))
 		{ //delayed allocation case
@@ -525,7 +525,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
 			printk(KERN_ERR "[ERROR] map_block error, flag=%x\n",map.m_flags);
 
 	}
-	//yuhun
+	//2448
 }
 
 static void io_submit_add_bh(struct ext4_io_submit *io,
