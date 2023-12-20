@@ -826,7 +826,7 @@ static int _ext4_get_block(struct inode *inode, sector_t iblock,
 	map.m_lblk = iblock;
 	map.m_len = bh->b_size >> inode->i_blkbits;
 //2448
-	map.m_flags=10; //debug
+	map.m_flags=0; //debug off
 //2448
 	ret = ext4_map_blocks(ext4_journal_current_handle(), inode, &map,
 			      flags);
